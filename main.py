@@ -4,7 +4,7 @@ import json
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QComboBox, QSlider, QFrame, QLineEdit,
-    QMessageBox, QFileDialog  # NOUVEAU: Pour la sélection de dossier
+    QMessageBox, QFileDialog
 )
 from PyQt6.QtCore import Qt, QUrl, QTime
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
@@ -16,14 +16,11 @@ BACKGROUND_COLOR = "#121212"
 FOREGROUND_COLOR = "#FFFFFF"
 MILD_GRAY = "#282828"
 
-# Chemin de votre dossier audio (Désormais défini dynamiquement)
-# FOLDER_PATH = r"C:\Users\xMoOnManFr\Documents\Audio files python project" # Remplacé
-
 # Fichier de stockage des playlists
 PLAYLIST_FILE = "playlists.json"
 # Fichier de configuration pour stocker le chemin du dossier audio
 CONFIG_FILE = "config.json"
-DEFAULT_FOLDER_NAME = "Audio files python project"  # Nom du dossier par défaut à créer
+DEFAULT_FOLDER_NAME = "Audio files fake spotify"  
 
 
 class MusicPlayer(QMainWindow):
@@ -32,13 +29,13 @@ class MusicPlayer(QMainWindow):
         self.setWindowTitle("Spotify du pauvre (PyQt)")
         self.setGeometry(100, 100, 400, 850)
 
-        # --- NOUVEAU : Assurer que le dossier audio existe ---
+        # Assurer que le dossier audio existe
         self.audio_folder_path = self.ensure_audio_folder()
         if not self.audio_folder_path:
             # Si l'utilisateur annule le dialogue, on quitte l'application
             sys.exit(0)
 
-        # --- Variables d'état des Playlists ---
+        # Variables d'état des Playlists
         self.all_files_in_folder = [f for f in os.listdir(self.audio_folder_path) if f.endswith(".mp3")]
 
         self.playlists = self.load_playlists()
@@ -51,7 +48,7 @@ class MusicPlayer(QMainWindow):
         self.current_track_index = -1
         self.is_user_seeking = False
 
-        # --- 1. Initialisation des composants PyQt Multimédia ---
+        # Initialisation des composants PyQt
         self.media_player = QMediaPlayer()
         self.audio_output = QAudioOutput()
         self.media_player.setAudioOutput(self.audio_output)
@@ -74,7 +71,7 @@ class MusicPlayer(QMainWindow):
         self.save_playlists()
         event.accept()
 
-    # --- NOUVELLE FONCTION DE GESTION DE DOSSIER ---
+    # NOUVELLE FONCTION DE GESTION DE DOSSIER
 
     def ensure_audio_folder(self):
         """Vérifie si le chemin du dossier audio est stocké ou demande à l'utilisateur de le définir."""
@@ -94,7 +91,7 @@ class MusicPlayer(QMainWindow):
             except:
                 path = None  # Fichier corrompu
 
-        # 2. Si le chemin n'est pas défini, demander à l'utilisateur
+        # Si le chemin n'est pas défini, demander à l'utilisateur
         if not path:
             QMessageBox.information(self, "Configuration Initiale",
                                     f"Veuillez sélectionner le dossier où seront stockés vos fichiers MP3 et où sera créé le dossier '{DEFAULT_FOLDER_NAME}'.")
@@ -133,7 +130,7 @@ class MusicPlayer(QMainWindow):
             QMessageBox.critical(self, "Erreur de Sauvegarde Configuration",
                                  f"Impossible de sauvegarder le fichier de configuration : {e}")
 
-    # --- SETUP UI (inchangé) ---
+    # SETUP UI
 
     def set_style(self):
         self.setStyleSheet(f"""
@@ -318,7 +315,7 @@ class MusicPlayer(QMainWindow):
         self.next_btn.clicked.connect(self.next_track)
         self.stop_btn.clicked.connect(self.stop_track)
 
-    # --- LOGIQUE DE FILTRAGE DES PISTES DISPONIBLES (inchangée) ---
+    # LOGIQUE DE FILTRAGE DES PISTES DISPONIBLES
 
     def update_available_tracks_combo(self):
         """Met à jour la liste déroulante des pistes disponibles pour l'ajout."""
@@ -343,7 +340,7 @@ class MusicPlayer(QMainWindow):
 
         self.all_tracks_combo.blockSignals(False)
 
-    # --- FONCTION DE TÉLÉCHARGEMENT YOUTUBE (Mise à jour du chemin) ---
+    # FONCTION DE TÉLÉCHARGEMENT YOUTUBE
 
     def download_youtube_mp3(self):
         """Télécharge la vidéo YouTube comme fichier MP3 dans le dossier défini."""
@@ -358,7 +355,6 @@ class MusicPlayer(QMainWindow):
 
         ydl_opts = {
             'format': 'bestaudio/best',
-            # ATTENTION : Utilisation de self.audio_folder_path
             'outtmpl': os.path.join(self.audio_folder_path, '%(title)s.%(ext)s'),
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -420,7 +416,7 @@ class MusicPlayer(QMainWindow):
             self.update_files_combo()
             self.combo.setCurrentText(new_track_name)
 
-    # --- FONCTIONS DE GESTION DE PLAYLIST (Mise à jour) ---
+    # FONCTIONS DE GESTION DE PLAYLIST
 
     def save_playlists(self):
         """Sauvegarde les playlists."""
@@ -482,7 +478,7 @@ class MusicPlayer(QMainWindow):
         self.status_label.setText(f"Piste ajoutée à '{self.current_playlist_name}'.")
         self.combo.setCurrentText(selected_track)
 
-        # --- Fonctions de lecture (Mise à jour du chemin) ---
+        # Fonctions de lecture
 
     def format_time(self, milliseconds):
         time_obj = QTime(0, 0, 0)
@@ -526,7 +522,6 @@ class MusicPlayer(QMainWindow):
 
         self.current_track_index = index
         track_name = self.current_playlist_files[index]
-        # ATTENTION : Utilisation de self.audio_folder_path
         path_audiofile = os.path.join(self.audio_folder_path, track_name)
 
         self.status_label.setText(f"Piste sélectionnée : {track_name}")
@@ -611,9 +606,9 @@ class MusicPlayer(QMainWindow):
 
 
 if __name__ == "__main__":
-    # Si vous utilisez Windows, lancez le script sous 'votre_script.pyw' pour éviter le terminal.
     app = QApplication(sys.argv)
     player = MusicPlayer()
     player.show()
+
 
     sys.exit(app.exec())
